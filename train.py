@@ -151,7 +151,9 @@ def train(options):
 
             total_loss += loss.item()
             count += 1
-            progressbar.set_postfix(loss = f"{loss.item():.4f}")
+
+            # Print Progress Bar
+            progressbar.set_postfix(loss = f"{loss.item():.4f}", vram=get_gpu_memory_usage())
 
         avg_loss = total_loss / count
         print(f"[Epoch {epoch}] Avg Loss: {avg_loss:.4f}")
@@ -188,6 +190,11 @@ def train(options):
             torch.save(model.garment_proj.state_dict(), os.path.join(inference_dir, "dress_garment_proj.pt"))
             print(f"[✓] Inference models saved to {inference_dir}")
 
+def get_gpu_memory_usage(device_id=0):
+    mem_allocated = torch.cuda.memory_allocated(device_id) / 1024**3
+    mem_reserved = torch.cuda.memory_reserved(device_id) / 1024**3
+    total_mem = torch.cuda.get_device_properties(device_id).total_memory / 1024**3
+    return f"{mem_allocated:.1f}G / {total_mem:.1f}G"
 
 def print_options(options):
     print("\n🛠️  Training Configuration:")
@@ -199,11 +206,11 @@ def print_options(options):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--batch_size', type=int, default=1)
-    parser.add_argument('--resume', choices=['latest', 'best'], default='latest')
-    parser.add_argument('--profiler', type=int, default=0, help="Enable step-wise profiler (1 to enable)")
-    parser.add_argument('--device', type=str, default=None)
-    parser.add_argument('--workers', type=int, default=4)
+    parser.add_argument('-b', '--batch_size', type=int, default=2)
+    parser.add_argument('-r', '--resume', choices=['latest', 'best'], default='latest')
+    parser.add_argument('-p', '--profiler', type=int, default=0, help="Enable step-wise profiler (1 to enable)")
+    parser.add_argument('-d', '--device', type=str, default=None)
+    parser.add_argument('-w', '--workers', type=int, default=4)
 
     return parser.parse_args()
 
