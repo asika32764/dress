@@ -40,7 +40,9 @@ class OOTDiffusion(nn.Module):
             ).sample  # [B, C, H, W]
 
         # 攤平成每張圖一個特徵向量： [B, C]
-        g_vector = g_feat.mean(dim=[2, 3])  # [B, C]
+        # g_vector = g_feat.mean(dim=[2, 3])  # [B, C]
+        # 更快的做法
+        g_vector = F.adaptive_avg_pool2d(g_feat, 1).squeeze(-1).squeeze(-1)  # [B, C]
 
         # 投影成 conditioning 維度： [B, 768]
         g_projected = self.garment_proj(g_vector)  # [B, 768]
