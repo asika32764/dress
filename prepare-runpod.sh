@@ -1,3 +1,6 @@
+apt update
+apt install unzip
+
 python -m venv venv
 source venv/bin/activate
 
