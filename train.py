@@ -28,7 +28,7 @@ def train():
 
     # ==== 資料集與 DataLoader ====
     dataset = IGPairDataset("./data", image_size=512)
-    dataloader = DataLoader(dataset, batch_size=ㄅ, shuffle=True, num_workers=4)
+    dataloader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=4)
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=5e-5)
 
