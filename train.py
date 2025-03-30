@@ -28,7 +28,7 @@ def train():
 
     # ==== 資料集與 DataLoader ====
     dataset = IGPairDataset("./data", image_size=512)
-    dataloader = DataLoader(dataset, batch_size=2, shuffle=True, num_workers=4)
+    dataloader = DataLoader(dataset, batch_size=ㄅ, shuffle=True, num_workers=4)
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=5e-5)
 
@@ -73,6 +73,8 @@ def train():
             optimizer.step()
 
             print(f"Loss: {loss.item():.4f}")
+
+        torch.cuda.empty_cache()
 
 if __name__ == "__main__":
     train()
