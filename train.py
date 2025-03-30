@@ -72,7 +72,9 @@ def train(options):
         start_epoch = checkpoint.get("epoch", 0) + 1
         best_loss = checkpoint.get("best_loss", float('inf'))
         print(f"[Resume] Resumed from epoch {start_epoch}")
+
     profiler.log('>> start epoch looping')
+
     for epoch in range(start_epoch, 10):
         total_loss = 0
         count = 0
@@ -156,14 +158,14 @@ def train(options):
 
         # 儲存 checkpoint
         os.makedirs("output", exist_ok=True)
-        ckpt_path = f"output/dress_epoch_{epoch:02d}.pt"
+        latest_path = "output/latest.pt"
         torch.save({
             'epoch': epoch,
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
             'best_loss': best_loss
-        }, ckpt_path)
-        print(f"[Checkpoint] Saved at {ckpt_path}")
+        }, latest_path)
+        print(f"[Checkpoint] Latest checkpoint saved at {latest_path}")
 
         # 如果是目前最佳 loss，也儲存一份 best
         if avg_loss < best_loss:
@@ -176,6 +178,16 @@ def train(options):
                 'best_loss': best_loss
             }, best_path)
             print(f"[✓] New best model saved at {best_path} with loss {best_loss:.4f}")
+
+            # === 儲存推論用模型 ===
+            inference_dir = "output/inference"
+            os.makedirs(inference_dir, exist_ok=True)
+
+            torch.save(model.denoising_unet.state_dict(), os.path.join(inference_dir, "dress_denoising_unet.pt"))
+            torch.save(model.outfitting_unet.state_dict(), os.path.join(inference_dir, "dress_outfitting_unet.pt"))
+            torch.save(model.garment_proj.state_dict(), os.path.join(inference_dir, "dress_garment_proj.pt"))
+            print(f"[✓] Inference models saved to {inference_dir}")
+
 
 def print_options(options):
     print("\n🛠️  Training Configuration:")
